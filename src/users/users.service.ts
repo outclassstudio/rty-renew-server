@@ -48,6 +48,22 @@ export class UsersService {
           error: '존재하지 않는 아이디입니다',
         };
       }
-    } catch (error) {}
+      const checkedPwd = await user.checkPassword(pwd);
+      if (!checkedPwd) {
+        return {
+          ok: false,
+          error: '잘못된 비밀번호 입니다',
+        };
+      }
+      return {
+        ok: true,
+        token: 'ganadara',
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
   }
 }

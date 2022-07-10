@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateAccountInput } from './dtos/create-account.dto';
+import { LoginInput } from './dtos/login.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -16,7 +17,9 @@ export class UsersController {
 
   //로그인 요청
   @Post('/login')
-  login() {}
+  login(@Body() loginInput: LoginInput) {
+    return this.usersService.login(loginInput);
+  }
 
   //회원가입요청
   @Post('/signup')
