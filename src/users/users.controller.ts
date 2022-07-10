@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CreateAccountInput } from './dtos/create-account.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -11,7 +20,9 @@ export class UsersController {
 
   //회원가입요청
   @Post('/signup')
-  signUp() {}
+  signUp(@Body() createAccountInput: CreateAccountInput) {
+    return this.usersService.createAccount(createAccountInput);
+  }
 
   //아이디중복검사
   @Get('/checkid/:id')
