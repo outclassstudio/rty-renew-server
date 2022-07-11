@@ -5,6 +5,7 @@ import { ItemsModule } from './items/items.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Users } from './users/entities/users.entity';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   //.env설정해야함. 관련 라이브러리 깔아야함
@@ -29,6 +30,9 @@ import { Users } from './users/entities/users.entity';
     UsersModule,
     GiftsModule,
     ItemsModule,
+    JwtModule.forRoot({
+      privateKey: process.env.PRIVATE_KEY,
+    }),
   ],
   controllers: [],
   providers: [],
