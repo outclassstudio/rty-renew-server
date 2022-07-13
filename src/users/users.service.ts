@@ -70,4 +70,9 @@ export class UsersService {
       };
     }
   }
+
+  //db에서 아이디로 찾기
+  async findById(id: number): Promise<Users> {
+    return this.users.findOne({ where: { id } });
+  }
 }

@@ -8,7 +8,13 @@ export class JwtService {
   constructor(
     @Inject(CONFIG_OPTIONS) private readonly options: JwtModuleOptions,
   ) {}
+  //토큰생성
   sign(userId: number): string {
     return jwt.sign({ id: userId }, this.options.privateKey);
+  }
+
+  //토큰유효성 검사
+  verify(token: string) {
+    return jwt.verify(token, this.options.privateKey);
   }
 }
