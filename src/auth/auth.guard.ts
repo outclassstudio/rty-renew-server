@@ -4,7 +4,8 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 @Injectable()
 export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
-    const user = context['user'];
+    //미들웨어에서 request에 user를 생성하는 것을 기준으로 통과여부를 결정한다
+    const user = context.switchToHttp().getRequest()['user'];
     if (!user) {
       return false;
     }

@@ -4,6 +4,11 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
+import {
+  ChangePwdInput,
+  UserProfileInput,
+  UserProfileOutput,
+} from './dtos/user-profile.dto';
 import { Users } from './entities/users.entity';
 
 @Injectable()
@@ -22,7 +27,6 @@ export class UsersService {
     try {
       const exist = await this.users.findOne({ where: { userId } });
       if (exist) {
-        console.log('왜 여기로 빠짐', exist);
         return {
           ok: false,
           error: '이미 존재하는 아이디입니다',
@@ -69,6 +73,18 @@ export class UsersService {
         error,
       };
     }
+  }
+
+  //유저정보수정
+  async editProfile(userId: string, userProfile: UserProfileInput) {
+    return await this.users.update({ userId }, { ...userProfile });
+  }
+
+  //비밀번호수정
+  async changePwd(userId: string, changePwdInput: ChangePwdInput) {
+    const user = await this.users.findOne({ where: { userId } });
+    user.pwd = changePwdInput.pwd;
+    return this.users.save(user);
   }
 
   //db에서 아이디로 찾기

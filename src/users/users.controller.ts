@@ -6,9 +6,16 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
+import {
+  ChangePwdInput,
+  UserProfileInput,
+  UserProfileOutput,
+} from './dtos/user-profile.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -32,8 +39,12 @@ export class UsersController {
   checkId(@Param('id') id: string) {}
 
   //내정보 조회
+  @UseGuards(AuthGuard)
   @Get('/:id')
-  findMyInfo(@Param('id') id: string) {}
+  async findMyInfo(@Param('id') id: number): Promise<UserProfileOutput> {
+    const myInfo = await this.usersService.findById(+id);
+    return myInfo;
+  }
 
   //남정보 조회
   @Get('/find/:id')
@@ -44,16 +55,48 @@ export class UsersController {
   getTheme() {}
 
   //테마포함 유저정보 수정
-  @Patch('/users/:id')
-  patchUserInfo(@Param('id') id: string) {}
+  @UseGuards(AuthGuard)
+  @Patch('/:id')
+  async patchUserInfo(
+    @Param('id') userId: string,
+    @Body() userProfile: UserProfileInput,
+  ) {
+    try {
+      await this.usersService.editProfile(userId, userProfile);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
 
   //비번확인
   @Post('/pwdcheck')
-  pwdCheck() {}
+  async pwdCheck() {}
 
   //!비번 수정엔드포인트 수정 요망
-  @Post('/updatepwd')
-  pwdUpdate() {}
+  @UseGuards(AuthGuard)
+  @Post('/updatepwd/:id')
+  async pwdUpdate(
+    @Param('id') userId: string,
+    @Body() changePwdInput: ChangePwdInput,
+  ) {
+    try {
+      await this.usersService.changePwd(userId, changePwdInput);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
 
   @Delete('/:id')
   deleteUser(@Param('id') id: string) {}
