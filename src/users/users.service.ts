@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
-import { LoginInput } from './dtos/login.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   ChangePwdInput,
   UserProfileInput,
@@ -23,7 +24,7 @@ export class UsersService {
     pwd,
     nickname,
     birth,
-  }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
+  }: CreateAccountInput): Promise<CoreOutput> {
     try {
       const exist = await this.users.findOne({ where: { userId } });
       if (exist) {
@@ -42,10 +43,7 @@ export class UsersService {
   }
 
   //로그인 요청을 위한 함수
-  async login({
-    userId,
-    pwd,
-  }: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {
+  async login({ userId, pwd }: LoginInput): Promise<LoginOutput> {
     try {
       const user = await this.users.findOne({ where: { userId } });
       if (!user) {
@@ -76,19 +74,79 @@ export class UsersService {
   }
 
   //유저정보수정
-  async editProfile(userId: string, userProfile: UserProfileInput) {
-    return await this.users.update({ userId }, { ...userProfile });
+  async editProfile(
+    userId: string,
+    userProfile: UserProfileInput,
+  ): Promise<CoreOutput> {
+    try {
+      await this.users.update({ userId }, { ...userProfile });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
   }
 
   //비밀번호수정
-  async changePwd(userId: string, changePwdInput: ChangePwdInput) {
-    const user = await this.users.findOne({ where: { userId } });
-    user.pwd = changePwdInput.pwd;
-    return this.users.save(user);
+  async changePwd(
+    userId: string,
+    changePwdInput: ChangePwdInput,
+  ): Promise<CoreOutput> {
+    try {
+      const user = await this.users.findOne({ where: { userId } });
+      user.pwd = changePwdInput.pwd;
+      console.log(user, '뭐라고 찍히나 보자');
+      this.users.save(user);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
   }
 
   //db에서 아이디로 찾기
-  async findById(id: number): Promise<Users> {
-    return this.users.findOne({ where: { id } });
+  async findById(id: number): Promise<UserProfileOutput> {
+    try {
+      const myInfo = await this.users.findOne({ where: { id } });
+      return {
+        ok: true,
+        data: myInfo,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  //db에서 아이디로 찾기
+  async findByUserId(userId: string): Promise<CoreOutput> {
+    try {
+      const findId = await this.users.findOne({ where: { userId } });
+      if (findId) {
+        return {
+          ok: false,
+          error: '이미 존재하는 아이디 입니다.',
+        };
+      }
+      return {
+        ok: true,
+        message: '사용 가능한 아이디 입니다',
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
   }
 }

@@ -1,12 +1,6 @@
-export interface UserProfileInput {
-  nickname?: string;
-  birth?: string;
-  theme?: number;
-  point?: number;
-  msg?: string;
-}
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
-export interface UserProfileOutput {
+export class User {
   id: number;
   userId: string;
   pwd: string;
@@ -19,6 +13,18 @@ export interface UserProfileOutput {
   updatedAt: Date;
 }
 
-export interface ChangePwdInput {
+export class UserProfileInput {
+  nickname?: string;
+  birth?: string;
+  theme?: number;
+  point?: number;
+  msg?: string;
+}
+
+export class UserProfileOutput extends CoreOutput {
+  data?: User;
+}
+
+export class ChangePwdInput {
   pwd: string;
 }

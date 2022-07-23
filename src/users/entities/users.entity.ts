@@ -41,11 +41,13 @@ export class Users extends CoreEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    try {
-      this.pwd = await bcrypt.hash(this.pwd, 10);
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
+    if (this.pwd) {
+      try {
+        this.pwd = await bcrypt.hash(this.pwd, 10);
+      } catch (error) {
+        console.log(error);
+        throw new InternalServerErrorException();
+      }
     }
   }
 

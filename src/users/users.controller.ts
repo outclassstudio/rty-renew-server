@@ -9,8 +9,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 import { CreateAccountInput } from './dtos/create-account.dto';
-import { LoginInput } from './dtos/login.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   ChangePwdInput,
   UserProfileInput,
@@ -24,30 +25,31 @@ export class UsersController {
 
   //로그인 요청
   @Post('/login')
-  login(@Body() loginInput: LoginInput) {
+  login(@Body() loginInput: LoginInput): Promise<LoginOutput> {
     return this.usersService.login(loginInput);
   }
 
   //회원가입요청
   @Post('/signup')
-  signUp(@Body() createAccountInput: CreateAccountInput) {
+  signUp(@Body() createAccountInput: CreateAccountInput): Promise<CoreOutput> {
     return this.usersService.createAccount(createAccountInput);
   }
 
   //아이디중복검사
-  @Get('/checkid/:id')
-  checkId(@Param('id') id: string) {}
+  @Get('/checkid/:userId')
+  checkId(@Param('userId') userId: string) {
+    return this.usersService.findByUserId(userId);
+  }
 
   //내정보 조회
   @UseGuards(AuthGuard)
   @Get('/:id')
-  async findMyInfo(@Param('id') id: number): Promise<UserProfileOutput> {
-    const myInfo = await this.usersService.findById(+id);
-    return myInfo;
+  findMyInfo(@Param('id') id: number): Promise<UserProfileOutput> {
+    return this.usersService.findById(+id);
   }
 
   //남정보 조회
-  @Get('/find/:id')
+  @Get('/find/:userId')
   findOtherInfo(@Param('id') id: string) {}
 
   //테마불러오기
@@ -56,46 +58,26 @@ export class UsersController {
 
   //테마포함 유저정보 수정
   @UseGuards(AuthGuard)
-  @Patch('/:id')
-  async patchUserInfo(
-    @Param('id') userId: string,
+  @Patch('/:userId')
+  patchUserInfo(
+    @Param('userId') userId: string,
     @Body() userProfile: UserProfileInput,
-  ) {
-    try {
-      await this.usersService.editProfile(userId, userProfile);
-      return {
-        ok: true,
-      };
-    } catch (error) {
-      return {
-        ok: false,
-        error,
-      };
-    }
+  ): Promise<CoreOutput> {
+    return this.usersService.editProfile(userId, userProfile);
   }
 
   //비번확인
   @Post('/pwdcheck')
-  async pwdCheck() {}
+  pwdCheck() {}
 
   //!비번 수정엔드포인트 수정 요망
   @UseGuards(AuthGuard)
-  @Post('/updatepwd/:id')
-  async pwdUpdate(
-    @Param('id') userId: string,
+  @Patch('/updatepwd/:userId')
+  pwdUpdate(
+    @Param('userId') userId: string,
     @Body() changePwdInput: ChangePwdInput,
-  ) {
-    try {
-      await this.usersService.changePwd(userId, changePwdInput);
-      return {
-        ok: true,
-      };
-    } catch (error) {
-      return {
-        ok: false,
-        error,
-      };
-    }
+  ): Promise<CoreOutput> {
+    return this.usersService.changePwd(userId, changePwdInput);
   }
 
   @Delete('/:id')
