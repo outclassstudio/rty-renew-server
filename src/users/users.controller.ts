@@ -86,6 +86,9 @@ export class UsersController {
     return this.usersService.changePwd(userId, changePwdInput);
   }
 
-  @Delete('/:id')
-  deleteUser(@Param('id') id: string) {}
+  //계정삭제
+  @Delete('/:userId')
+  deleteAccount(@Param('userId') userId: string): Promise<CoreOutput> {
+    return this.usersService.deleteAccount(userId);
+  }
 }
