@@ -73,6 +73,25 @@ export class UsersService {
     }
   }
 
+  //비밀번호 체크를 위한 함수
+  //?겹치는 부분에 대한 검토 필요
+  async checkPwd(
+    userId: string,
+    currentPwd: ChangePwdInput,
+  ): Promise<CoreOutput> {
+    const user = await this.users.findOne({ where: { userId } });
+    const checkedPwd = await user.checkPassword(currentPwd.pwd);
+    if (!checkedPwd) {
+      return {
+        ok: false,
+        error: '잘못된 비밀번호 입니다',
+      };
+    }
+    return {
+      ok: true,
+    };
+  }
+
   //유저정보수정
   async editProfile(
     userId: string,
