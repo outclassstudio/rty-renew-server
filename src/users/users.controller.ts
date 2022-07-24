@@ -67,8 +67,14 @@ export class UsersController {
   }
 
   //비번확인
-  @Post('/pwdcheck')
-  pwdCheck() {}
+  @UseGuards(AuthGuard)
+  @Post('/pwdcheck/:userId')
+  pwdCheck(
+    @Param('userId') userId: string,
+    @Body() currentPwd: ChangePwdInput,
+  ): Promise<CoreOutput> {
+    return this.usersService.checkPwd(userId, currentPwd);
+  }
 
   //!비번 수정엔드포인트 수정 요망
   @UseGuards(AuthGuard)
