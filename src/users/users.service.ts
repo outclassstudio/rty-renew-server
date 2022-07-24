@@ -168,4 +168,28 @@ export class UsersService {
       };
     }
   }
+
+  //계정삭제
+  async deleteAccount(userId: string): Promise<CoreOutput> {
+    try {
+      const user = await this.users.findOne({ where: { userId } });
+      if (!user) {
+        return {
+          ok: false,
+          message: '존재하지 않는 계정입니다',
+        };
+      }
+      this.users.remove(user);
+      return {
+        ok: true,
+        message: '계정이 삭제되었습니다',
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
 }
