@@ -1,28 +1,12 @@
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { Users } from '../entities/users.entity';
 
-export class User {
-  id: number;
-  userId: string;
-  pwd: string;
-  nickname: string;
-  birth?: string;
-  theme: number;
-  point: number;
-  msg: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export class UserProfileInput {
-  nickname?: string;
-  birth?: string;
-  theme?: number;
-  point?: number;
-  msg?: string;
-}
+export type UserProfileInput = Partial<
+  Pick<Users, 'nickname' | 'birth' | 'theme' | 'point' | 'msg'>
+>;
 
 export class UserProfileOutput extends CoreOutput {
-  data?: User;
+  data?: Users;
 }
 
 export class ChangePwdInput {

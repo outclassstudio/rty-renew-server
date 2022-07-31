@@ -4,16 +4,19 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { JwtMiddleware } from './jwt/jwt.middleware';
+import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { GiftsModule } from './gifts/gifts.module';
 import { ItemsModule } from './items/items.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { Users } from './users/entities/users.entity';
 import { JwtModule } from './jwt/jwt.module';
-import { JwtMiddleware } from './jwt/jwt.middleware';
-import { UsersController } from './users/users.controller';
 import { AuthModule } from './auth/auth.module';
+import { Users } from './users/entities/users.entity';
+import { UserItem } from './users/entities/useritem.entity';
+import { Items } from './items/entities/items.entity';
+import { Gifts } from './gifts/entities/gifts.entity';
 
 @Module({
   //.env설정해야함. 관련 라이브러리 깔아야함
@@ -33,7 +36,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: true,
       //참조할 엔티티
-      entities: [Users],
+      entities: [Users, UserItem, Items, Gifts],
     }),
     UsersModule,
     GiftsModule,
