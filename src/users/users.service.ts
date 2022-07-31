@@ -26,7 +26,9 @@ export class UsersService {
     birth,
   }: CreateAccountInput): Promise<CoreOutput> {
     try {
-      const exist = await this.users.findOne({ where: { userId } });
+      const exist = await this.users.findOne({
+        where: { userId },
+      });
       if (exist) {
         return {
           ok: false,
@@ -134,7 +136,10 @@ export class UsersService {
   //db에서 아이디로 찾기
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const myInfo = await this.users.findOne({ where: { id } });
+      const myInfo = await this.users.findOne({
+        where: { id },
+        relations: ['userItems', 'fromGifts', 'toGifts'],
+      });
       return {
         ok: true,
         data: myInfo,

@@ -1,25 +1,11 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Column, Entity } from 'typeorm';
+import { Items } from 'src/items/entities/items.entity';
+import { Users } from 'src/users/entities/users.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Gifts extends CoreEntity {
-  @Column()
-  @IsString()
-  user_from: string;
-
-  @Column()
-  @IsString()
-  user_to: string;
-
-  @Column()
-  @IsNumber()
-  img: number;
-
-  @Column()
-  @IsNumber()
-  svg: number;
-
   @Column()
   @IsString()
   content: string;
@@ -31,4 +17,16 @@ export class Gifts extends CoreEntity {
   @Column()
   @IsString()
   svg_attr: string;
+
+  @ManyToOne((type) => Users, (user) => user.fromGifts)
+  userFrom: Users;
+
+  @ManyToOne((type) => Users, (user) => user.toGifts)
+  userTo: Users;
+
+  @ManyToOne((type) => Items, (item) => item.giftImages)
+  img: Items;
+
+  @ManyToOne((type) => Items, (item) => item.giftSvgs)
+  svg: Items;
 }

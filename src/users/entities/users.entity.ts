@@ -1,8 +1,10 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
+import { UserItem } from './useritem.entity';
+import { Gifts } from 'src/gifts/entities/gifts.entity';
 
 @Entity()
 export class Users extends CoreEntity {
@@ -37,6 +39,21 @@ export class Users extends CoreEntity {
   @IsString()
   @IsOptional()
   msg: string;
+
+  @OneToMany((type) => UserItem, (userItem) => userItem.user, {
+    nullable: true,
+  })
+  userItems: UserItem[];
+
+  @OneToMany((type) => Gifts, (gift) => gift.userFrom, {
+    nullable: true,
+  })
+  fromGifts: Gifts[];
+
+  @OneToMany((type) => Gifts, (gift) => gift.userTo, {
+    nullable: true,
+  })
+  toGifts: Gifts[];
 
   @BeforeInsert()
   @BeforeUpdate()
