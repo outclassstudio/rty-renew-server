@@ -17,6 +17,8 @@ import { Users } from './users/entities/users.entity';
 import { UserItem } from './users/entities/useritem.entity';
 import { Items } from './items/entities/items.entity';
 import { Gifts } from './gifts/entities/gifts.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   //.env설정해야함. 관련 라이브러리 깔아야함
@@ -25,6 +27,9 @@ import { Gifts } from './gifts/entities/gifts.entity';
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
       ignoreEnvFile: process.env.NODE_ENV === 'prod',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..'),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
