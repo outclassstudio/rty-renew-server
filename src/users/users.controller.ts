@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 import { CreateAccountInput } from './dtos/create-account.dto';
@@ -17,6 +18,7 @@ import {
   UserProfileInput,
   UserProfileOutput,
 } from './dtos/user-profile.dto';
+import { Users } from './entities/users.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -43,14 +45,14 @@ export class UsersController {
 
   //내정보 조회
   @UseGuards(AuthGuard)
-  @Get('/:id')
-  findMyInfo(@Param('id') id: number): Promise<UserProfileOutput> {
-    return this.usersService.findById(+id);
+  @Get()
+  findMyInfo(@AuthUser() user: Users): Promise<UserProfileOutput> {
+    return this.usersService.findById(user);
   }
 
   //남정보 조회
-  @Get('/find/:userId')
-  findOtherInfo(@Param('id') id: string) {}
+  @Get('/find')
+  findOtherInfo(@AuthUser() user: Users) {}
 
   //테마불러오기
   @Get('/theme')
@@ -58,37 +60,37 @@ export class UsersController {
 
   //테마포함 유저정보 수정
   @UseGuards(AuthGuard)
-  @Patch('/:userId')
+  @Patch()
   patchUserInfo(
-    @Param('userId') userId: string,
+    @AuthUser() user: Users,
     @Body() userProfile: UserProfileInput,
   ): Promise<CoreOutput> {
-    return this.usersService.editProfile(userId, userProfile);
+    return this.usersService.editProfile(user, userProfile);
   }
 
   //비번확인
   @UseGuards(AuthGuard)
-  @Post('/pwdcheck/:userId')
+  @Post('/pwdcheck')
   pwdCheck(
-    @Param('userId') userId: string,
+    @AuthUser() user: Users,
     @Body() currentPwd: ChangePwdInput,
   ): Promise<CoreOutput> {
-    return this.usersService.checkPwd(userId, currentPwd);
+    return this.usersService.checkPwd(user, currentPwd);
   }
 
   //!비번 수정엔드포인트 수정 요망
   @UseGuards(AuthGuard)
-  @Patch('/updatepwd/:userId')
+  @Patch('/updatepwd')
   pwdUpdate(
-    @Param('userId') userId: string,
+    @AuthUser() user: Users,
     @Body() changePwdInput: ChangePwdInput,
   ): Promise<CoreOutput> {
-    return this.usersService.changePwd(userId, changePwdInput);
+    return this.usersService.changePwd(user, changePwdInput);
   }
 
   //계정삭제
-  @Delete('/:userId')
-  deleteAccount(@Param('userId') userId: string): Promise<CoreOutput> {
-    return this.usersService.deleteAccount(userId);
+  @Delete()
+  deleteAccount(@AuthUser() user: Users): Promise<CoreOutput> {
+    return this.usersService.deleteAccount(user);
   }
 }

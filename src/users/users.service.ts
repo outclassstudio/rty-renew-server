@@ -78,10 +78,10 @@ export class UsersService {
   //비밀번호 체크를 위한 함수
   //?겹치는 부분에 대한 검토 필요
   async checkPwd(
-    userId: string,
+    { id }: Users,
     currentPwd: ChangePwdInput,
   ): Promise<CoreOutput> {
-    const user = await this.users.findOne({ where: { userId } });
+    const user = await this.users.findOne({ where: { id } });
     const checkedPwd = await user.checkPassword(currentPwd.pwd);
     if (!checkedPwd) {
       return {
@@ -96,11 +96,11 @@ export class UsersService {
 
   //유저정보수정
   async editProfile(
-    userId: string,
+    { id }: Users,
     userProfile: UserProfileInput,
   ): Promise<CoreOutput> {
     try {
-      await this.users.update({ userId }, { ...userProfile });
+      await this.users.update({ id }, { ...userProfile });
       return {
         ok: true,
       };
@@ -114,11 +114,11 @@ export class UsersService {
 
   //비밀번호수정
   async changePwd(
-    userId: string,
+    { id }: Users,
     changePwdInput: ChangePwdInput,
   ): Promise<CoreOutput> {
     try {
-      const user = await this.users.findOne({ where: { userId } });
+      const user = await this.users.findOne({ where: { id } });
       user.pwd = changePwdInput.pwd;
       console.log(user, '뭐라고 찍히나 보자');
       this.users.save(user);
@@ -134,7 +134,7 @@ export class UsersService {
   }
 
   //db에서 아이디로 찾기
-  async findById(id: number): Promise<UserProfileOutput> {
+  async findById({ id }: Users): Promise<UserProfileOutput> {
     try {
       const myInfo = await this.users.findOne({
         where: { id },
@@ -175,9 +175,9 @@ export class UsersService {
   }
 
   //계정삭제
-  async deleteAccount(userId: string): Promise<CoreOutput> {
+  async deleteAccount({ id }: Users): Promise<CoreOutput> {
     try {
-      const user = await this.users.findOne({ where: { userId } });
+      const user = await this.users.findOne({ where: { id } });
       if (!user) {
         return {
           ok: false,
