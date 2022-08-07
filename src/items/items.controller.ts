@@ -1,5 +1,7 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { Users } from 'src/users/entities/users.entity';
+import { BuyItemInput, BuyItemOutput } from './dtos/buy-item.dto';
 import { GetItemOutput } from './dtos/get-item.dto';
 import { ItemsService } from './items.service';
 
@@ -9,16 +11,22 @@ export class ItemsController {
 
   //상점에서 아이템 불러오기
   @Get()
-  @UseGuards(AuthGuard)
   getAllItems(): Promise<GetItemOutput> {
     return this.itemService.getAllItems();
   }
 
   //내 아이템 불러오기
-  @Get('/:id')
-  getMyItems() {}
+  @Get('/my')
+  getMyItems(@AuthUser() user: Users): Promise<GetItemOutput> {
+    return this.itemService.getMyItems(user);
+  }
 
   //선물 사기 및 포인트 차감
-  @Post('/:id')
-  buyItems() {}
+  @Post()
+  buyItems(
+    @AuthUser() user: Users,
+    @Body() buyItemInput: BuyItemInput,
+  ): Promise<BuyItemOutput> {
+    return this.itemService.buyItems(user, buyItemInput);
+  }
 }
