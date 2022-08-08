@@ -23,10 +23,10 @@ export class ItemsController {
 
   //선물 사기 및 포인트 차감
   @Post()
-  buyItems(
+  buyItem(
     @AuthUser() user: Users,
     @Body() buyItemInput: BuyItemInput,
   ): Promise<BuyItemOutput> {
-    return this.itemService.buyItems(user, buyItemInput);
+    return this.itemService.buyItem(user, buyItemInput);
   }
 }

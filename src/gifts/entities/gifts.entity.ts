@@ -4,19 +4,25 @@ import { Items } from 'src/items/entities/items.entity';
 import { Users } from 'src/users/entities/users.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
+class SvgAttribute {
+  position?: {
+    x: number;
+    y: number;
+  };
+}
+
 @Entity()
 export class Gifts extends CoreEntity {
-  @Column()
+  @Column({ nullable: true })
   @IsString()
-  content: string;
+  content?: string;
 
-  @Column()
+  @Column({ default: 'box' })
   @IsString()
   status: string;
 
-  @Column()
-  @IsString()
-  svg_attr: string;
+  @Column({ type: 'json', nullable: true })
+  svg_attr?: SvgAttribute;
 
   @ManyToOne((type) => Users, (user) => user.fromGifts)
   userFrom: Users;

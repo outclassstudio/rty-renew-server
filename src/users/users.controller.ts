@@ -46,7 +46,7 @@ export class UsersController {
   //내정보 조회
   @UseGuards(AuthGuard)
   @Get()
-  findMyInfo(@AuthUser() user: Users): Promise<UserProfileOutput> {
+  GetMyInfo(@AuthUser() user: Users): Promise<UserProfileOutput> {
     return this.usersService.findById(user);
   }
 
@@ -56,7 +56,7 @@ export class UsersController {
 
   //테마불러오기
   @Get('/theme')
-  getTheme() {}
+  getTheme(@AuthUser() user: Users) {}
 
   //테마포함 유저정보 수정
   @UseGuards(AuthGuard)
@@ -71,21 +71,21 @@ export class UsersController {
   //비번확인
   @UseGuards(AuthGuard)
   @Post('/pwdcheck')
-  pwdCheck(
+  checkPassowrd(
     @AuthUser() user: Users,
     @Body() currentPwd: ChangePwdInput,
   ): Promise<CoreOutput> {
-    return this.usersService.checkPwd(user, currentPwd);
+    return this.usersService.checkPassowrd(user, currentPwd);
   }
 
   //!비번 수정엔드포인트 수정 요망
   @UseGuards(AuthGuard)
   @Patch('/updatepwd')
-  pwdUpdate(
+  changePassoword(
     @AuthUser() user: Users,
     @Body() changePwdInput: ChangePwdInput,
   ): Promise<CoreOutput> {
-    return this.usersService.changePwd(user, changePwdInput);
+    return this.usersService.changePassoword(user, changePwdInput);
   }
 
   //계정삭제

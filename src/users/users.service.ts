@@ -77,7 +77,7 @@ export class UsersService {
 
   //비밀번호 체크를 위한 함수
   //?겹치는 부분에 대한 검토 필요
-  async checkPwd(
+  async checkPassowrd(
     { id }: Users,
     currentPwd: ChangePwdInput,
   ): Promise<CoreOutput> {
@@ -113,7 +113,7 @@ export class UsersService {
   }
 
   //비밀번호수정
-  async changePwd(
+  async changePassoword(
     { id }: Users,
     changePwdInput: ChangePwdInput,
   ): Promise<CoreOutput> {

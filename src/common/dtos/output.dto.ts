@@ -1,5 +1,5 @@
 export class CoreOutput {
-  error?: string;
   ok: boolean;
+  error?: string;
   message?: string;
 }
