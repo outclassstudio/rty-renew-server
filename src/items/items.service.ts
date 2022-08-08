@@ -49,7 +49,7 @@ export class ItemsService {
     }
   }
 
-  async buyItems(
+  async buyItem(
     { id }: Users,
     { itemId }: BuyItemInput,
   ): Promise<BuyItemOutput> {
