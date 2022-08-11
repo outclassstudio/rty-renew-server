@@ -33,13 +33,12 @@ export class ItemsService {
   }
 
   async getMyItems({ userId }: Users): Promise<GetMyItemOutput> {
-    const data = await this.userItem.find({
-      where: { user: { userId } },
-      relations: ['item'],
-    });
-    const myItems = data.map((el) => el.item);
-
     try {
+      const data = await this.userItem.find({
+        where: { user: { userId } },
+        relations: ['item'],
+      });
+      const myItems = data.map((el) => el.item);
       return { ok: true, myItems };
     } catch (error) {
       return {
@@ -69,7 +68,7 @@ export class ItemsService {
         };
       }
       const point = user.point - item.point;
-      await this.usersService.editProfile(user, { point });
+      await this.usersService.patchUserInfo(user, { point });
       await this.userItem.save(this.userItem.create({ user, item }));
       return {
         ok: true,

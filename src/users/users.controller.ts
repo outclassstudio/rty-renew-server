@@ -15,8 +15,8 @@ import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   ChangePwdInput,
+  UserInfoOutput,
   UserProfileInput,
-  UserProfileOutput,
 } from './dtos/user-profile.dto';
 import { Users } from './entities/users.entity';
 import { UsersService } from './users.service';
@@ -46,13 +46,20 @@ export class UsersController {
   //내정보 조회
   @UseGuards(AuthGuard)
   @Get()
-  GetMyInfo(@AuthUser() user: Users): Promise<UserProfileOutput> {
+  getMyInfo(@AuthUser() user: Users): Promise<UserInfoOutput> {
     return this.usersService.findById(user);
   }
 
   //남정보 조회
+  @UseGuards(AuthGuard)
+  @Get('/:userId')
+  getOthersInfo(@Param() userId: string): Promise<UserInfoOutput> {
+    return this.usersService.findByUserId(userId);
+  }
+
+  //아이디로 검색
   @Get('/find')
-  findOtherInfo(@AuthUser() user: Users) {}
+  findOtherInfo() {}
 
   //테마불러오기
   @Get('/theme')
@@ -65,7 +72,7 @@ export class UsersController {
     @AuthUser() user: Users,
     @Body() userProfile: UserProfileInput,
   ): Promise<CoreOutput> {
-    return this.usersService.editProfile(user, userProfile);
+    return this.usersService.patchUserInfo(user, userProfile);
   }
 
   //비번확인
@@ -93,4 +100,8 @@ export class UsersController {
   deleteAccount(@AuthUser() user: Users): Promise<CoreOutput> {
     return this.usersService.deleteAccount(user);
   }
+
+  //랜덤으로 유저 추천
+  @Get()
+  findRandomUser() {}
 }
