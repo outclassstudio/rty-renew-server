@@ -7,8 +7,8 @@ import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   ChangePwdInput,
+  UserInfoOutput,
   UserProfileInput,
-  UserProfileOutput,
 } from './dtos/user-profile.dto';
 import { Users } from './entities/users.entity';
 
@@ -95,7 +95,7 @@ export class UsersService {
   }
 
   //유저정보수정
-  async editProfile(
+  async patchUserInfo(
     { id }: Users,
     userProfile: UserProfileInput,
   ): Promise<CoreOutput> {
@@ -120,7 +120,6 @@ export class UsersService {
     try {
       const user = await this.users.findOne({ where: { id } });
       user.pwd = changePwdInput.pwd;
-      console.log(user, '뭐라고 찍히나 보자');
       this.users.save(user);
       return {
         ok: true,
@@ -134,15 +133,15 @@ export class UsersService {
   }
 
   //db에서 아이디로 찾기
-  async findById({ id }: Users): Promise<UserProfileOutput> {
+  async findById({ id }: Users): Promise<UserInfoOutput> {
     try {
-      const myInfo = await this.users.findOne({
+      const userInfo = await this.users.findOne({
         where: { id },
         relations: ['userItems', 'fromGifts', 'toGifts'],
       });
       return {
         ok: true,
-        data: myInfo,
+        userInfo,
       };
     } catch (error) {
       return {
@@ -153,7 +152,29 @@ export class UsersService {
   }
 
   //db에서 아이디로 찾기
-  async findByUserId(userId: string): Promise<CoreOutput> {
+  async findByUserId(userId: string): Promise<UserInfoOutput> {
+    try {
+      const userInfo = await this.users.findOne({ where: { userId } });
+      if (!userInfo) {
+        return {
+          ok: false,
+          error: '유저정보가 존재하지 않습니다.',
+        };
+      }
+      return {
+        ok: true,
+        userInfo,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  //db에서 아이디로 찾기
+  async checkUserId(userId: string): Promise<CoreOutput> {
     try {
       const findId = await this.users.findOne({ where: { userId } });
       if (findId) {
@@ -181,7 +202,7 @@ export class UsersService {
       if (!user) {
         return {
           ok: false,
-          message: '존재하지 않는 계정입니다',
+          error: '존재하지 않는 계정입니다',
         };
       }
       this.users.remove(user);

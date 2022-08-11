@@ -17,7 +17,7 @@ export class GiftsService {
     @InjectRepository(Items) private readonly items: Repository<Items>,
   ) {}
 
-  async getGift({ id }: Users): Promise<GetMyGiftOutput> {
+  async getMyGift({ id }: Users): Promise<GetMyGiftOutput> {
     try {
       const gift = await this.gifts.find({
         where: { userTo: { id } },

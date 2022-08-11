@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtMiddleware } from './jwt/jwt.middleware';
@@ -17,10 +12,10 @@ import { Users } from './users/entities/users.entity';
 import { UserItem } from './users/entities/useritem.entity';
 import { Items } from './items/entities/items.entity';
 import { Gifts } from './gifts/entities/gifts.entity';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ItemsController } from './items/items.controller';
 import { GiftsController } from './gifts/gifts.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   //.env설정해야함. 관련 라이브러리 깔아야함
@@ -28,7 +23,7 @@ import { GiftsController } from './gifts/gifts.controller';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
-      ignoreEnvFile: process.env.NODE_ENV === 'prod',
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..'),
@@ -40,7 +35,7 @@ import { GiftsController } from './gifts/gifts.controller';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      synchronize: process.env.NODE_ENV !== 'prod',
+      synchronize: true,
       logging: true,
       //참조할 엔티티
       entities: [Users, UserItem, Items, Gifts],

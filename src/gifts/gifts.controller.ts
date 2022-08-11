@@ -20,8 +20,8 @@ export class GiftsController {
 
   //내 선물 불러오기
   @Get()
-  getGift(@AuthUser() user: Users): Promise<GetMyGiftOutput> {
-    return this.giftsService.getGift(user);
+  getMyGift(@AuthUser() user: Users): Promise<GetMyGiftOutput> {
+    return this.giftsService.getMyGift(user);
   }
 
   //선물 변경사항 저장(타입 및 위치)
