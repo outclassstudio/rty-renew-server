@@ -12,7 +12,7 @@
 - User-item CRUD
 - Gifts CRUD
 - Items CRUD
-- heroku로 백엔드 
+- heroku로 백엔드 배포
 
 ## 구현예정 기능
 - 비밀번호 수정(해싱문제 개선)
