@@ -12,9 +12,10 @@
 - User-item CRUD
 - Gifts CRUD
 - Items CRUD
+- heroku로 백엔드 
 
 ## 구현예정 기능
-- 비밀번호 수정
+- 비밀번호 수정(해싱문제 개선)
 - 내 공간에 배치한 SVG업데이트
 - heroku 배포 안정화
 
