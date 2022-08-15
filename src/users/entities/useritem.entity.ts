@@ -5,10 +5,10 @@ import { Users } from './users.entity';
 
 @Entity()
 export class UserItem extends CoreEntity {
-  @ManyToOne((type) => Users, (user) => user.userItems)
+  @ManyToOne((type) => Users, (user) => user.userItems, { onDelete: 'CASCADE' })
   user: Users;
 
-  @ManyToOne((type) => Items, (item) => item.userItems)
+  @ManyToOne((type) => Items, (item) => item.userItems, { onDelete: 'CASCADE' })
   @JoinTable()
   item: Items;
 }

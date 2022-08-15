@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CoreOutput } from 'src/common/dtos/output.dto';
+import { AuthUserInput, UserInfoOutput } from 'src/users/dtos/user-profile.dto';
 import { UserItem } from 'src/users/entities/useritem.entity';
 import { Users } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
@@ -7,6 +9,7 @@ import { Repository } from 'typeorm';
 import { BuyItemInput, BuyItemOutput } from './dtos/buy-item.dto';
 import { GetItemOutput, GetMyItemOutput } from './dtos/get-item.dto';
 import { Items } from './entities/items.entity';
+import { ItemsSeed } from './items.data';
 
 @Injectable()
 export class ItemsService {
@@ -15,11 +18,33 @@ export class ItemsService {
     @InjectRepository(Users) private readonly users: Repository<Users>,
     @InjectRepository(UserItem) private readonly userItem: Repository<UserItem>,
     private readonly usersService: UsersService,
-  ) {}
+  ) {
+    this.create();
+  }
+
+  async create(): Promise<CoreOutput> {
+    try {
+      ItemsSeed.map(async (item) => {
+        const find = await this.items.findOne({ where: { name: item.name } });
+        if (find) {
+          return false;
+        }
+        await this.items.save(this.items.create(item));
+      });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
 
   async getAllItems(): Promise<GetItemOutput> {
     try {
-      const items = await this.items.find();
+      const items = await this.items.find({ order: { id: 'ASC' } });
       return {
         ok: true,
         items,
@@ -32,10 +57,11 @@ export class ItemsService {
     }
   }
 
-  async getMyItems({ userId }: Users): Promise<GetMyItemOutput> {
+  async getMyItems(user: UserInfoOutput): Promise<GetMyItemOutput> {
     try {
+      console.log('---------------왜그러냐', user);
       const data = await this.userItem.find({
-        where: { user: { userId } },
+        where: { user: { id: user.userInfo.id } },
         relations: ['item'],
       });
       const myItems = data.map((el) => el.item);
@@ -49,7 +75,7 @@ export class ItemsService {
   }
 
   async buyItem(
-    { id }: Users,
+    { userInfo: { id } }: AuthUserInput,
     { itemId }: BuyItemInput,
   ): Promise<BuyItemOutput> {
     try {
@@ -68,7 +94,10 @@ export class ItemsService {
         };
       }
       const point = user.point - item.point;
-      await this.usersService.patchUserInfo(user, { point });
+      await this.usersService.patchUserInfo(
+        { ok: true, userInfo: user },
+        { point },
+      );
       await this.userItem.save(this.userItem.create({ user, item }));
       return {
         ok: true,

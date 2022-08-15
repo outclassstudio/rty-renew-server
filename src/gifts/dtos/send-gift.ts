@@ -1,7 +1,7 @@
 import { CoreOutput } from 'src/common/dtos/output.dto';
 
 export class SendGiftInput {
-  toUserId: number;
+  userTo: string;
   svgId: number;
   imgId: number;
   content: string;

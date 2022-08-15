@@ -14,7 +14,9 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
+  AuthUserInput,
   ChangePwdInput,
+  FindUserOutput,
   UserInfoOutput,
   UserProfileInput,
 } from './dtos/user-profile.dto';
@@ -46,20 +48,24 @@ export class UsersController {
   //내정보 조회
   @UseGuards(AuthGuard)
   @Get()
-  getMyInfo(@AuthUser() user: Users): Promise<UserInfoOutput> {
+  getMyInfo(@AuthUser() user: any): Promise<UserInfoOutput> {
+    // console.log('------------------유저??', user);
     return this.usersService.findById(user);
   }
 
   //남정보 조회
   @UseGuards(AuthGuard)
   @Get('/:userId')
-  getOthersInfo(@Param() userId: string): Promise<UserInfoOutput> {
+  getOthersInfo(@Param('userId') userId: string): Promise<UserInfoOutput> {
     return this.usersService.findByUserId(userId);
   }
 
   //아이디로 검색
-  @Get('/find')
-  findOtherInfo() {}
+  @UseGuards(AuthGuard)
+  @Get('/find/:userId')
+  findUser(@Param('userId') userId: string): Promise<FindUserOutput> {
+    return this.usersService.findUser(userId);
+  }
 
   //테마불러오기
   @Get('/theme')
@@ -69,10 +75,19 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Patch()
   patchUserInfo(
-    @AuthUser() user: Users,
+    @AuthUser() user: AuthUserInput,
     @Body() userProfile: UserProfileInput,
   ): Promise<CoreOutput> {
     return this.usersService.patchUserInfo(user, userProfile);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('/theme/:themeId')
+  changeTheme(
+    @AuthUser() user: AuthUserInput,
+    @Param('themeId') themeId: number,
+  ): Promise<CoreOutput> {
+    return this.usersService.changeTheme(user, themeId);
   }
 
   //비번확인
@@ -97,7 +112,7 @@ export class UsersController {
 
   //계정삭제
   @Delete()
-  deleteAccount(@AuthUser() user: Users): Promise<CoreOutput> {
+  deleteAccount(@AuthUser() user: AuthUserInput): Promise<CoreOutput> {
     return this.usersService.deleteAccount(user);
   }
 

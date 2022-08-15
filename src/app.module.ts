@@ -16,6 +16,7 @@ import { ItemsController } from './items/items.controller';
 import { GiftsController } from './gifts/gifts.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   //.env설정해야함. 관련 라이브러리 깔아야함
@@ -47,6 +48,7 @@ import { join } from 'path';
       privateKey: process.env.PRIVATE_KEY,
     }),
     AuthModule,
+    SeederModule,
   ],
   controllers: [],
   providers: [],
