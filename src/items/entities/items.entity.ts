@@ -2,6 +2,7 @@ import { IsNumber, IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Gifts } from 'src/gifts/entities/gifts.entity';
 import { UserItem } from 'src/users/entities/useritem.entity';
+import { Users } from 'src/users/entities/users.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
@@ -25,15 +26,18 @@ export class Items extends CoreEntity {
   @OneToMany((type) => UserItem, (useritem) => useritem.item, {
     nullable: true,
   })
-  userItems: UserItem[];
+  userItems?: UserItem[];
 
   @OneToMany((type) => Gifts, (gift) => gift.img, {
     nullable: true,
   })
-  giftImages: Gifts[];
+  giftImages?: Gifts[];
 
   @OneToMany((type) => Gifts, (gift) => gift.svg, {
     nullable: true,
   })
-  giftSvgs: Gifts[];
+  giftSvgs?: Gifts[];
+
+  @OneToMany((type) => Users, (user) => user.theme)
+  userTheme?: Users[];
 }

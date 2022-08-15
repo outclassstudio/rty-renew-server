@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { AuthUserInput } from 'src/users/dtos/user-profile.dto';
 import { Users } from 'src/users/entities/users.entity';
 import { GetMyGiftOutput } from './dtos/get-mygift.dto';
 import { SendGiftInput, SendGiftOutput } from './dtos/send-gift';
@@ -20,7 +21,7 @@ export class GiftsController {
 
   //내 선물 불러오기
   @Get()
-  getMyGift(@AuthUser() user: Users): Promise<GetMyGiftOutput> {
+  getMyGift(@AuthUser() user: AuthUserInput): Promise<GetMyGiftOutput> {
     return this.giftsService.getMyGift(user);
   }
 
@@ -41,7 +42,7 @@ export class GiftsController {
   //선불 보내기
   @Post()
   sendGift(
-    @AuthUser() user: Users,
+    @AuthUser() user: AuthUserInput,
     @Body() sendGiftInput: SendGiftInput,
   ): Promise<SendGiftOutput> {
     return this.giftsService.sendGift(user, sendGiftInput);
@@ -49,7 +50,7 @@ export class GiftsController {
 
   //내가 보낸 선물 조회
   @Get('/sent')
-  getSentGift(@AuthUser() user: Users) {
+  getSentGift(@AuthUser() user: AuthUserInput) {
     return this.giftsService.getSentGift(user);
   }
 }

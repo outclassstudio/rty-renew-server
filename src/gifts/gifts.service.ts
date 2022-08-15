@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Items } from 'src/items/entities/items.entity';
+import { AuthUserInput } from 'src/users/dtos/user-profile.dto';
 import { Users } from 'src/users/entities/users.entity';
 import { Repository } from 'typeorm';
 import { GetMyGiftOutput } from './dtos/get-mygift.dto';
@@ -17,7 +18,9 @@ export class GiftsService {
     @InjectRepository(Items) private readonly items: Repository<Items>,
   ) {}
 
-  async getMyGift({ id }: Users): Promise<GetMyGiftOutput> {
+  async getMyGift({
+    userInfo: { id },
+  }: AuthUserInput): Promise<GetMyGiftOutput> {
     try {
       const gift = await this.gifts.find({
         where: { userTo: { id } },
@@ -93,13 +96,14 @@ export class GiftsService {
     }
   }
 
+  //!100포인트추가
   async sendGift(
-    user: Users,
+    { userInfo: { id } }: AuthUserInput,
     sendGiftInput: SendGiftInput,
   ): Promise<SendGiftOutput> {
-    const userFrom = await this.users.findOne({ where: { id: user.id } });
+    const userFrom = await this.users.findOne({ where: { id } });
     const userTo = await this.users.findOne({
-      where: { id: sendGiftInput.toUserId },
+      where: { userId: sendGiftInput.userTo },
     });
     if (!userTo) {
       return {
@@ -126,15 +130,22 @@ export class GiftsService {
         content,
       }),
     );
+    userFrom.point += 100;
+    await this.users.save(userFrom);
     return {
       ok: true,
       message: '선물이 성공적으로 보내졌어요',
     };
   }
 
-  async getSentGift({ id }: Users): Promise<GetSentGiftOutput> {
+  async getSentGift({
+    userInfo: { id },
+  }: AuthUserInput): Promise<GetSentGiftOutput> {
     try {
-      const gift = await this.gifts.find({ where: { userFrom: { id } } });
+      const gift = await this.gifts.find({
+        where: { userFrom: { id } },
+        relations: ['userFrom', 'userTo', 'img', 'svg'],
+      });
       if (!gift) {
         return {
           ok: false,

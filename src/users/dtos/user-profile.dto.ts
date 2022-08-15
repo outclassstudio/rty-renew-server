@@ -5,8 +5,16 @@ export type UserProfileInput = Partial<
   Pick<Users, 'nickname' | 'birth' | 'theme' | 'point' | 'msg'>
 >;
 
+export class AuthUserInput extends CoreOutput {
+  userInfo?: Users;
+}
+
 export class UserInfoOutput extends CoreOutput {
   userInfo?: Users;
+}
+
+export class FindUserOutput extends CoreOutput {
+  userInfo?: Users[];
 }
 
 export class ChangePwdInput {

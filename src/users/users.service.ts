@@ -1,21 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import { Items } from 'src/items/entities/items.entity';
 import { JwtService } from 'src/jwt/jwt.service';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
+  AuthUserInput,
   ChangePwdInput,
+  FindUserOutput,
   UserInfoOutput,
   UserProfileInput,
 } from './dtos/user-profile.dto';
+import { UserItem } from './entities/useritem.entity';
 import { Users } from './entities/users.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(Users) private readonly users: Repository<Users>,
+    @InjectRepository(UserItem)
+    private readonly userItems: Repository<UserItem>,
+    @InjectRepository(Items) private readonly items: Repository<Items>,
     private readonly jwtService: JwtService,
   ) {}
   //계정 생성을 위한 함수
@@ -35,9 +42,14 @@ export class UsersService {
           error: '이미 존재하는 아이디입니다',
         };
       }
-      await this.users.save(
-        this.users.create({ userId, pwd, nickname, birth }),
+      const theme = await this.items.findOne({ where: { id: 5 } });
+      const user = await this.users.save(
+        this.users.create({ userId, pwd, nickname, birth, theme }),
       );
+      const freeItem = await this.items.find({ where: { point: 0 } });
+      freeItem.forEach(async (item) => {
+        await this.userItems.save(this.userItems.create({ user, item }));
+      });
       return { ok: true };
     } catch (error) {
       return { ok: false, error: '계정을 생성하지 못했습니다' };
@@ -96,7 +108,7 @@ export class UsersService {
 
   //유저정보수정
   async patchUserInfo(
-    { id }: Users,
+    { userInfo: { id } }: AuthUserInput,
     userProfile: UserProfileInput,
   ): Promise<CoreOutput> {
     try {
@@ -133,11 +145,12 @@ export class UsersService {
   }
 
   //db에서 아이디로 찾기
-  async findById({ id }: Users): Promise<UserInfoOutput> {
+  //!jwt토큰 미들웨어에서 사용하므로, 건드리지 말아야 함
+  async findById(id: number): Promise<UserInfoOutput> {
     try {
       const userInfo = await this.users.findOne({
         where: { id },
-        relations: ['userItems', 'fromGifts', 'toGifts'],
+        relations: ['userItems', 'fromGifts', 'toGifts', 'theme'],
       });
       return {
         ok: true,
@@ -154,7 +167,10 @@ export class UsersService {
   //db에서 아이디로 찾기
   async findByUserId(userId: string): Promise<UserInfoOutput> {
     try {
-      const userInfo = await this.users.findOne({ where: { userId } });
+      const userInfo = await this.users.findOne({
+        where: { userId: userId },
+        relations: ['theme'],
+      });
       if (!userInfo) {
         return {
           ok: false,
@@ -164,6 +180,76 @@ export class UsersService {
       return {
         ok: true,
         userInfo,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  //아이디 또는 닉네임으로 사람 찾기
+  async findUser(userId: string): Promise<FindUserOutput> {
+    try {
+      const userInfo = await this.users.find({
+        where: [
+          { userId: Raw((user) => `${user} ILIKE '%${userId}%'`) },
+          { nickname: Raw((nickname) => `${nickname} ILIKE '%${userId}%'`) },
+        ],
+        select: {
+          id: true,
+          userId: true,
+          nickname: true,
+          birth: true,
+          theme: {
+            data: true,
+          },
+        },
+        relations: ['theme'],
+      });
+      if (!userInfo) {
+        return {
+          ok: false,
+          error: '찾으시는 유저가 없어요',
+        };
+      }
+      return {
+        ok: true,
+        userInfo,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  async changeTheme(
+    { userInfo: { id } }: AuthUserInput,
+    themeId: number,
+  ): Promise<CoreOutput> {
+    try {
+      const user = await this.users.findOne({ where: { id } });
+      if (!user) {
+        return {
+          ok: false,
+          error: '유저를 찾을 수 없어요',
+        };
+      }
+      const theme = await this.items.findOne({ where: { id: themeId } });
+      if (!theme) {
+        return {
+          ok: false,
+          error: '테마를 찾을 수 없어요',
+        };
+      }
+      user.theme = theme;
+      await this.users.save(user);
+      return {
+        ok: true,
+        message: '테마가 변경되었어요',
       };
     } catch (error) {
       return {
@@ -196,7 +282,9 @@ export class UsersService {
   }
 
   //계정삭제
-  async deleteAccount({ id }: Users): Promise<CoreOutput> {
+  async deleteAccount({
+    userInfo: { id },
+  }: AuthUserInput): Promise<CoreOutput> {
     try {
       const user = await this.users.findOne({ where: { id } });
       if (!user) {

@@ -1,10 +1,18 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UserItem } from './useritem.entity';
 import { Gifts } from 'src/gifts/entities/gifts.entity';
+import { Items } from 'src/items/entities/items.entity';
 
 @Entity()
 export class Users extends CoreEntity {
@@ -25,12 +33,11 @@ export class Users extends CoreEntity {
   @IsOptional()
   birth: string;
 
-  @Column({ default: 1 })
-  @IsNumber()
-  @IsOptional()
-  theme: number;
+  //!테마 릴레이션
+  @ManyToOne((type) => Items, (item) => item.userTheme)
+  theme: Items;
 
-  @Column({ default: 0 })
+  @Column({ default: 100 })
   @IsNumber()
   @IsOptional()
   point: number;
@@ -56,7 +63,7 @@ export class Users extends CoreEntity {
   toGifts: Gifts[];
 
   @BeforeInsert()
-  @BeforeUpdate()
+  // @BeforeUpdate()
   async hashPassword(): Promise<void> {
     if (this.pwd) {
       try {
