@@ -20,3 +20,7 @@ export class FindUserOutput extends CoreOutput {
 export class ChangePwdInput {
   pwd: string;
 }
+
+export class FindRandomUserOutput extends CoreOutput {
+  userInfo?: Users[];
+}

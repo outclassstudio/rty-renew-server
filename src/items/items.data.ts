@@ -1,7 +1,14 @@
 import { Items } from './entities/items.entity';
 
 export const ItemsSeed: Partial<Items>[] = [
-  //!테마
+  //! 배치물
+  {
+    name: '쓰레기통',
+    type: 'default',
+    data: 'static/default/wastecan.svg',
+    point: 0,
+  },
+  //! 테마
   {
     name: '바다속',
     type: 'theme',

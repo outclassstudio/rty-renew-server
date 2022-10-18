@@ -25,12 +25,19 @@ export class GiftsController {
     return this.giftsService.getMyGift(user);
   }
 
+  //남 선물 불러오기
+  @Get('/:id')
+  getOthersGift(@Param('id') id: number): Promise<GetMyGiftOutput> {
+    return this.giftsService.getOthersGift(id);
+  }
+
   //선물 변경사항 저장(타입 및 위치)
   @Patch()
   updateGift(
+    @AuthUser() user: AuthUserInput,
     @Body() updateGfitInput: UpdateGiftInput,
   ): Promise<UpdateGiftOutput> {
-    return this.giftsService.updateGift(updateGfitInput);
+    return this.giftsService.updateGift(user, updateGfitInput);
   }
 
   //특정 선물 삭제
