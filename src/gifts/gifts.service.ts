@@ -44,7 +44,32 @@ export class GiftsService {
     }
   }
 
+  async getOthersGift(id: number): Promise<GetMyGiftOutput> {
+    try {
+      const gift = await this.gifts.find({
+        where: { userTo: { id } },
+        relations: ['userFrom', 'userTo', 'img', 'svg'],
+      });
+      if (!gift) {
+        return {
+          ok: false,
+          error: '선물을 찾을 수 없어요',
+        };
+      }
+      return {
+        ok: true,
+        gift,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '선물리스트를 찾을 수 없어요',
+      };
+    }
+  }
+
   async updateGift(
+    { userInfo: { id } }: AuthUserInput,
     updateGfitInput: UpdateGiftInput,
   ): Promise<UpdateGiftOutput> {
     try {
@@ -57,9 +82,13 @@ export class GiftsService {
           error: '선물을 찾을 수 없어요',
         };
       }
-      const updatedGift = await this.gifts.save({
+      await this.gifts.save({
         id: updateGfitInput.id,
         ...updateGfitInput,
+      });
+      const updatedGift = await this.gifts.find({
+        where: { userTo: { id } },
+        relations: ['userFrom', 'userTo', 'img', 'svg'],
       });
       //!수정한 데이터 리턴 여부 확인
       return {

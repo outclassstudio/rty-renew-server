@@ -16,6 +16,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   AuthUserInput,
   ChangePwdInput,
+  FindRandomUserOutput,
   FindUserOutput,
   UserInfoOutput,
   UserProfileInput,
@@ -53,11 +54,18 @@ export class UsersController {
     return this.usersService.findById(user);
   }
 
-  //남정보 조회
+  //유저정보 조회
   @UseGuards(AuthGuard)
   @Get('/:userId')
   getOthersInfo(@Param('userId') userId: string): Promise<UserInfoOutput> {
     return this.usersService.findByUserId(userId);
+  }
+
+  //남정보 조회
+  @UseGuards(AuthGuard)
+  @Get('/others/:id')
+  getOthersInfoById(@Param('id') id: number): Promise<UserInfoOutput> {
+    return this.usersService.findByOtherUserId(id);
   }
 
   //아이디로 검색
@@ -117,6 +125,9 @@ export class UsersController {
   }
 
   //랜덤으로 유저 추천
-  @Get()
-  findRandomUser() {}
+  @UseGuards(AuthGuard)
+  @Get('/random/random')
+  findRandomUser(): Promise<FindRandomUserOutput> {
+    return this.usersService.findRandomUser();
+  }
 }

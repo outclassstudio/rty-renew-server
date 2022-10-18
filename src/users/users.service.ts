@@ -9,6 +9,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   AuthUserInput,
   ChangePwdInput,
+  FindRandomUserOutput,
   FindUserOutput,
   UserInfoOutput,
   UserProfileInput,
@@ -189,6 +190,31 @@ export class UsersService {
     }
   }
 
+  //db에서 아이디로 찾기
+  async findByOtherUserId(id: number): Promise<UserInfoOutput> {
+    try {
+      const userInfo = await this.users.findOne({
+        where: { id },
+        relations: ['theme'],
+      });
+      if (!userInfo) {
+        return {
+          ok: false,
+          error: '유저정보가 존재하지 않습니다.',
+        };
+      }
+      return {
+        ok: true,
+        userInfo,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
   //아이디 또는 닉네임으로 사람 찾기
   async findUser(userId: string): Promise<FindUserOutput> {
     try {
@@ -208,6 +234,7 @@ export class UsersService {
         },
         relations: ['theme'],
       });
+      console.log('----------', userInfo);
       if (!userInfo) {
         return {
           ok: false,
@@ -303,6 +330,37 @@ export class UsersService {
       return {
         ok: false,
         error,
+      };
+    }
+  }
+
+  //랜덤유저추처
+  async findRandomUser(): Promise<FindRandomUserOutput> {
+    try {
+      let entityLength = await this.users.count();
+      if (entityLength > 4) {
+        entityLength = 4;
+      }
+      //! 쿼리빌더 사용법 정리
+      let userInfo = await this.users
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.theme', 'item')
+        .orderBy('RANDOM()')
+        .limit(entityLength)
+        .getMany();
+
+      if (userInfo.length === 0) {
+        return {
+          ok: false,
+          error: '유저 정보가 없어요',
+        };
+      }
+      return { ok: true, userInfo };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: '유저 정보를 불러오는 중에 문제가 생겼어요',
       };
     }
   }

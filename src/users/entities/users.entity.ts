@@ -14,7 +14,7 @@ import { UserItem } from './useritem.entity';
 import { Gifts } from 'src/gifts/entities/gifts.entity';
 import { Items } from 'src/items/entities/items.entity';
 
-@Entity()
+@Entity('users')
 export class Users extends CoreEntity {
   @Column()
   @IsString()
