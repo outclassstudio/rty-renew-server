@@ -25,6 +25,12 @@ export class GiftsController {
     return this.giftsService.getMyGift(user);
   }
 
+  //내가 보낸 선물 조회
+  @Get('/sent')
+  getSentGift(@AuthUser() user: AuthUserInput) {
+    return this.giftsService.getSentGift(user);
+  }
+
   //남 선물 불러오기
   @Get('/:id')
   getOthersGift(@Param('id') id: number): Promise<GetMyGiftOutput> {
@@ -53,11 +59,5 @@ export class GiftsController {
     @Body() sendGiftInput: SendGiftInput,
   ): Promise<SendGiftOutput> {
     return this.giftsService.sendGift(user, sendGiftInput);
-  }
-
-  //내가 보낸 선물 조회
-  @Get('/sent')
-  getSentGift(@AuthUser() user: AuthUserInput) {
-    return this.giftsService.getSentGift(user);
   }
 }
