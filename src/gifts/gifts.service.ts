@@ -186,6 +186,7 @@ export class GiftsService {
         gift,
       };
     } catch (error) {
+      console.log(error);
       return {
         ok: false,
         error: '보낸 선물을 찾지 못했어요',
